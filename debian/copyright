@@ -1,0 +1,12 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: pymonetdb
+Source: https://github.com/gijzelaerr/pymonetdb
+
+Files:     debian/*
+Copyright: 2018 Gijs molenaar <gijs@pythonic.nl>
+License:   MIT
+
+Files:     *
+Copyright: 2011-2018 Bart Scheers
+License:   BSD-3
+

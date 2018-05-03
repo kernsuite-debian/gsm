@@ -1,0 +1,32 @@
+Source: gsm
+Section: python
+Priority: optional
+Maintainer: KERN packaging <packaging@kernsuite.info>
+Build-Depends: debhelper (>=9),
+               dh-python,
+               python-all,
+               python-setuptools,
+               python3-setuptools,
+               python3-all,
+               python-pymonetdb,
+               python3-pymonetdb
+Standards-Version: 3.9.8
+Homepage: https://github.com/bartscheers/gsm
+X-Python-Version: >= 2.6
+X-Python3-Version: >= 3.2
+
+Package: python-gsm
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}, ${python:Depends}
+Description:  Global Sky Model
+ Global Sky Model (GSM) is generated from a database that contains all sources
+ from the VLSS, TGSS, WENSS (main and polar) and NVSS survey catalogs. 
+
+Package: python3-gsm
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}, ${python3:Depends}
+Description: Native python3 client API for monetDB
+ Global Sky Model (GSM) is generated from a database that contains all sources
+ from the VLSS, TGSS, WENSS (main and polar) and NVSS survey catalogs. 
