@@ -1,0 +1,14 @@
+.debhelper/
+files
+python-gsm.debhelper.log
+python-gsm.postinst.debhelper
+python-gsm.prerm.debhelper
+python-gsm.substvars
+python-gsm/
+python3-gsm.debhelper.log
+python3-gsm.postinst.debhelper
+python3-gsm.prerm.debhelper
+python3-gsm.substvars
+python3-gsm/
+tmp/
+
