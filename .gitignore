@@ -1,0 +1,10 @@
+*.eps
+*.csv
+*.pyc
+
+build/
+dist/
+*.egg-info
+
+gsm/config/config.cfg
+gsm/db/batches/dump_gsm.sql
