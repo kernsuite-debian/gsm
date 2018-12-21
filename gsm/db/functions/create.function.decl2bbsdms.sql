@@ -25,18 +25,18 @@ BEGIN
       SET declDD = 0;
       SET declDDstr = '00';
     ELSE 
-      SET declDD = CAST(TRUNCATE(ABS(ideclDEG), 1) AS DOUBLE);
+      SET declDD = CAST("truncate"(ABS(ideclDEG), 1) AS DOUBLE);
       SET declDDstr = CONCAT('0', declDD);
     END IF;
   ELSE
-    SET declDD = CAST(TRUNCATE(ABS(ideclDEG), 2) AS DOUBLE);
+    SET declDD = CAST("truncate"(ABS(ideclDEG), 2) AS DOUBLE);
     SET declDDstr = CAST(declDD AS VARCHAR(2));
   END IF;
   
   IF ABS(ideclDEG) < 1 THEN
-    SET declMM = CAST(TRUNCATE((ABS(ideclDEG) * 60), 2) AS DOUBLE);
+    SET declMM = CAST("truncate"((ABS(ideclDEG) * 60), 2) AS DOUBLE);
   ELSE
-    SET declMM = CAST(TRUNCATE((ABS(ideclDEG) - declDD) * 60, 2) AS DOUBLE);
+    SET declMM = CAST("truncate"((ABS(ideclDEG) - declDD) * 60, 2) AS DOUBLE);
   END IF;
   IF declMM < 10 THEN
     SET declMMstr = CONCAT('0', declMM);
@@ -50,9 +50,9 @@ BEGIN
     SET declSS = ROUND((((ABS(ideclDEG) - declDD) * 60) - declMM) * 60, 2);
   END IF;
   IF declSS < 10 THEN
-    SET declSSstr = CAST(CONCAT('0', TRUNCATE(declSS, 4)) AS VARCHAR(5));
+    SET declSSstr = CAST(CONCAT('0', "truncate"(declSS, 4)) AS VARCHAR(5));
   ELSE
-    SET declSSstr = CAST(TRUNCATE(declSS, 5) AS VARCHAR(5));
+    SET declSSstr = CAST("truncate"(declSS, 5) AS VARCHAR(5));
   END IF;
 
   IF ideclDEG < 0 THEN

@@ -16,7 +16,13 @@
  *+-------------------------------------------------------------------+
  *| Open Questions/TODOs:                                             |
  *| (1) If we dump the default wenss data into a file, we can use that|
- *}     for even faster load.                                         |
+ *|     for even faster load.                                         |
+ *+-------------------------------------------------------------------+
+ *| Since Aug2018 the when statement in combination with a division   |
+ *| causes an error in rel_optimizer.c:2755.                          |
+ *| Until fix, we have a work-around. Note the rewrite of 1/sin^2 x as|
+ *| 1 + cot^2 x and that the sqrt and a_I^2 division are now outside  |
+ *| the when statement.                                               |
  *+-------------------------------------------------------------------+
  */
 DECLARE icatid_main, icatid_pole INT;
@@ -112,62 +118,81 @@ INSERT INTO catalogedsources
   ,i_int_avg_err
   ,frame
   )
-  SELECT aorig_catsrcid
-        ,CONCAT(TRIM(aname), af_name)
+  SELECT orig_catsrcid
+        ,catsrcname
+        ,cat_id
+        ,band
+        ,ra
+        ,decl
+        ,zone
+        ,SQRT(t.ra_err_inter / (t.a_I * t.a_I)) AS ra_err
+        ,SQRT(t.decl_err_inter / (t.a_I * t.a_I)) AS decl_err
+        ,freq_eff
+        ,x
+        ,y
+        ,z
+        ,src_type
+        ,fit_probl
+        ,pa
+        ,major
+        ,minor
+        ,i_peak_avg
+        ,i_peak_avg_err
+        ,i_int_avg
+        ,i_int_avg_err
+        ,frame
+    FROM (
+  SELECT aorig_catsrcid AS orig_catsrcid
+        ,CONCAT(TRIM(aname), af_name) AS catsrcname
         ,CASE WHEN aframe LIKE 'WNH%'
               THEN icatid_main
               ELSE icatid_pole
-         END
+         END AS cat_id
         ,CASE WHEN aframe LIKE 'WNH%'
               THEN iband_main
               ELSE iband_pole
-         END
-        ,aviz_RAJ2000
-        ,aviz_DEJ2000
-        ,CAST(FLOOR(aviz_DEJ2000) AS INTEGER)
-        ,CASE WHEN a_I / arms >= 10 
-              THEN 1.5
-              ELSE CASE WHEN amajor <> 0
-                        THEN SQRT(2.25 + arms * arms * (amajor * amajor * SIN(RADIANS(apa)) * SIN(RADIANS(apa)) 
-                                                       + aminor * aminor * COS(RADIANS(apa)) * COS(RADIANS(apa))
-                                                       ) / (1.69 * a_I * a_I))
-                        ELSE SQRT(2.25 + arms * arms * 2916 / (1.69 * a_I * a_I))
-                   END
-         END
-        ,CASE WHEN a_I / arms >= 10 
-              THEN 1.5
-              ELSE CASE WHEN amajor <> 0
-                        THEN SQRT(2.25 + arms * arms * (amajor * amajor * COS(RADIANS(apa)) * COS(RADIANS(apa)) 
-                                                       + aminor * aminor * SIN(RADIANS(apa)) * SIN(RADIANS(apa))
-                                                       ) / (1.69 * a_I * a_I)) 
-                        ELSE SQRT(2.25 + arms * arms * 2916 
-                                 / (1.69 * a_I * a_I * SIN(RADIANS(aviz_DEJ2000)) * SIN(RADIANS(aviz_DEJ2000)))
-                                 )
-                   END
-         END
+         END AS band
+        ,aviz_RAJ2000 AS ra
+        ,aviz_DEJ2000 AS decl
+        ,CAST(FLOOR(aviz_DEJ2000) AS INTEGER) AS zone
+        ,CASE WHEN a_I >= 10 * arms
+                THEN 1.5 * a_I * a_I
+              WHEN amajor <> 0
+                THEN 2.25 + 0.592 * arms * arms * ( amajor * amajor * SIN(RADIANS(apa)) * SIN(RADIANS(apa))
+                                                  + aminor * aminor * COS(RADIANS(apa)) * COS(RADIANS(apa)))
+              ELSE 2.25 + arms * arms * 1725
+         END AS ra_err_inter
+        ,CASE WHEN a_I >= 10 * arms
+                THEN 1.5 * a_I * a_I
+              WHEN amajor <> 0
+                THEN 2.25 + 0.592 * arms * arms * ( amajor * amajor * COS(RADIANS(apa)) * COS(RADIANS(apa))
+                                                  + aminor * aminor * SIN(RADIANS(apa)) * SIN(RADIANS(apa)))
+              ELSE 2.25 + arms * arms * 1725 * (1 + COT(RADIANS(aviz_DEJ2000)) * COT(RADIANS(aviz_DEJ2000)))
+         END AS decl_err_inter
         ,CASE WHEN aframe LIKE 'WNH%'
               THEN ifreq_eff_main
               ELSE ifreq_eff_pole
-         END
-        ,COS(RADIANS(aviz_DEJ2000)) * COS(RADIANS(aviz_RAJ2000))
-        ,COS(RADIANS(aviz_DEJ2000)) * SIN(RADIANS(aviz_RAJ2000))
-        ,SIN(RADIANS(aviz_DEJ2000))
-        ,aflg1
+         END AS freq_eff
+        ,COS(RADIANS(aviz_DEJ2000)) * COS(RADIANS(aviz_RAJ2000)) AS x
+        ,COS(RADIANS(aviz_DEJ2000)) * SIN(RADIANS(aviz_RAJ2000)) AS y
+        ,SIN(RADIANS(aviz_DEJ2000)) AS z
+        ,aflg1 AS src_type
         ,CASE WHEN aflg2 = '*'
               THEN aflg2
               ELSE NULL
-         END
-        ,apa
-        ,amajor
-        ,aminor
-        ,a_I / 1000
-        ,SQRT(C1_sq + C2_sq * (arms / a_I) * (arms / a_I)) * a_I / 1000
-        ,a_S / 1000
-        ,SQRT(C1_sq + C2_sq * (arms / a_S) * (arms / a_S)) * a_S / 1000
-        ,aframe
+         END AS fit_probl
+        ,apa AS pa
+        ,amajor AS major
+        ,aminor AS minor
+        ,a_I / 1000 AS i_peak_avg
+        ,SQRT(C1_sq + C2_sq * (arms / a_I) * (arms / a_I)) * a_I / 1000 AS i_peak_avg_err
+        ,a_S / 1000 AS i_int_avg
+        ,SQRT(C1_sq + C2_sq * (arms / a_S) * (arms / a_S)) * a_S / 1000 AS i_int_avg_err
+        ,aframe AS frame
+        ,a_I
     FROM aux_catalogedsources
    WHERE a_S > 0
---     AND af_name a_S > 0
+   ) t
 ;
 
 DROP TABLE aux_catalogedsources;

@@ -12,8 +12,8 @@ BEGIN
   DECLARE raHHstr, raMMstr VARCHAR(2); 
   DECLARE raSSstr VARCHAR(6);
   
-  SET raHHnum = TRUNCATE(iraDEG / 15, 2);
-  SET raMMnum = TRUNCATE((iraDEG / 15 - raHHnum) * 60, 2);
+  SET raHHnum = "truncate"(iraDEG / 15, 2);
+  SET raMMnum = "truncate"((iraDEG / 15 - raHHnum) * 60, 2);
   SET raSSnum = ROUND((((iraDEG / 15 - raHHnum) * 60) - raMMnum) * 60, 3);
   
   IF raHHnum < 10 THEN
@@ -29,9 +29,9 @@ BEGIN
   END IF;
 
   IF raSSnum < 10 THEN
-    SET raSSstr = CAST(CONCAT('0', TRUNCATE(raSSnum, 5)) AS VARCHAR(6));
+    SET raSSstr = CAST(CONCAT('0', "truncate"(raSSnum, 5)) AS VARCHAR(6));
   ELSE 
-    SET raSSstr = CAST(TRUNCATE(raSSnum,6) AS VARCHAR(6));  
+    SET raSSstr = CAST("truncate"(raSSnum,6) AS VARCHAR(6));  
   END IF;
 
   RETURN CONCAT(raHHstr, CONCAT(':', CONCAT(raMMstr, CONCAT(':', raSSstr))));

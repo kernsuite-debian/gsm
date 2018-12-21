@@ -1,4 +1,4 @@
-DROP FUNCTION getNeighborsInCats;
+--DROP FUNCTION getNeighborsInCats;
 
 CREATE FUNCTION getNeighborsInCats(itheta DOUBLE
                                   ,icatsrcid INT

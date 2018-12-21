@@ -13,14 +13,14 @@ BEGIN
   DECLARE odecldms VARCHAR(13);
   
   IF ABS(ideclDEG) < 10 THEN
-    SET declDD = CAST(TRUNCATE(ABS(ideclDEG), 1) AS DOUBLE);
+    SET declDD = CAST("truncate"(ABS(ideclDEG), 1) AS DOUBLE);
     SET declDDstr = CONCAT('0', declDD);
   ELSE
-    SET declDD = CAST(TRUNCATE(ABS(ideclDEG), 2) AS DOUBLE);
+    SET declDD = CAST("truncate"(ABS(ideclDEG), 2) AS DOUBLE);
     SET declDDstr = CAST(declDD AS VARCHAR(2));
   END IF;
   
-  SET declMM = CAST(TRUNCATE((ABS(ideclDEG) - declDD) * 60, 2) AS DOUBLE);
+  SET declMM = CAST("truncate"((ABS(ideclDEG) - declDD) * 60, 2) AS DOUBLE);
   IF declMM < 10 THEN
     SET declMMstr = CONCAT('0', declMM);
   ELSE 
@@ -29,9 +29,9 @@ BEGIN
   
   SET declSS = ROUND((((ABS(ideclDEG) - declDD) * 60) - declMM) * 60, 3);
   IF declSS < 10 THEN
-    SET declSSstr = CAST(CONCAT('0', TRUNCATE(declSS, 5)) AS VARCHAR(6));
+    SET declSSstr = CAST(CONCAT('0', "truncate"(declSS, 5)) AS VARCHAR(6));
   ELSE
-    SET declSSstr = CAST(TRUNCATE(declSS, 6) AS VARCHAR(6));
+    SET declSSstr = CAST("truncate"(declSS, 6) AS VARCHAR(6));
   END IF;
 
   IF ideclDEG < 0 THEN
